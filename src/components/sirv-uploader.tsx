@@ -10,7 +10,7 @@ interface SirvUploaderProps {
   clientSecret: string;
 }
 
-export function SirvUploader({
+export default function SirvUploader({
   uploadPath,
   clientId,
   clientSecret,

@@ -1,3 +1,3 @@
 import "./index.css";
 
-export { SirvUploader } from "./components/sirv-uploader";
+export { default as SirvUploader } from "./components/sirv-uploader";
