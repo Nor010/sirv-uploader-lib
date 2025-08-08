@@ -25,7 +25,7 @@
   "author": "Mainor Aguilar <mainor@savvly.com> (https://nor01.com)",
   "license": "MIT",
   "scripts": {
-    "build": "tsup src/index.ts --dts --format esm,cjs --out-dir dist --clean"
+    "build": "tsup"
   },
   "peerDependencies": {
     "react": "^18 || ^19",
