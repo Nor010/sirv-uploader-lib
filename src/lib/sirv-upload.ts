@@ -46,3 +46,44 @@ export async function uploadToSirvWithProgress(
 
   return promise;
 }
+
+export async function deleteFromSirv(
+  uploadPath: string,
+  fileName: string,
+  clientId: string,
+  clientSecret: string
+): Promise<void> {
+  const authRes = await fetch("https://api.sirv.com/v2/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify({ clientId, clientSecret }),
+  });
+  if (!authRes.ok) {
+    throw new Error(
+      `Token request failed (${authRes.status}): ${await authRes.text()}`
+    );
+  }
+  const { token } = await authRes.json();
+  if (!token) throw new Error("Sirv did not return a token.");
+
+  const safePath = uploadPath.endsWith("/") ? uploadPath : `${uploadPath}/`;
+  const encoded = encodeURIComponent(`${safePath}${fileName}`);
+
+  const delRes = await fetch(
+    `https://api.sirv.com/v2/files/delete?filename=${encoded}`,
+    {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (!delRes.ok) {
+    const text = await delRes.text();
+    throw new Error(
+      `Delete failed (${delRes.status}): ${text || "Unknown error"}`
+    );
+  }
+}

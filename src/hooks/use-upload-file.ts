@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { UploadFile } from "../types/upload";
-import { uploadToSirvWithProgress } from "../lib/sirv-upload";
+import { uploadToSirvWithProgress, deleteFromSirv } from "../lib/sirv-upload";
 
 interface UseFileUploadParams {
   uploadPath: string;
@@ -79,9 +79,39 @@ export function useFileUpload({
     files.filter((f) => f.status === "pending").forEach(uploadFile);
   }, [files, uploadFile]);
 
-  const removeFile = useCallback((id: string) => {
-    setFiles((prev) => prev.filter((f) => f.id !== id));
-  }, []);
+  const removeFile = useCallback(
+    async (id: string) => {
+      const target = files.find((f) => f.id === id);
+      if (!target) return;
+
+      if (target.status !== "success") {
+        setFiles((prev) => prev.filter((f) => f.id !== id));
+        return;
+      }
+
+      setFiles((prev) =>
+        prev.map((f) => (f.id === id ? { ...f, status: "deleting" } : f))
+      );
+
+      try {
+        await deleteFromSirv(
+          uploadPath,
+          target.file.name,
+          clientId,
+          clientSecret
+        );
+        setFiles((prev) => prev.filter((f) => f.id !== id));
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : "Delete failed";
+        setFiles((prev) =>
+          prev.map((f) =>
+            f.id === id ? { ...f, status: "error", error: msg } : f
+          )
+        );
+      }
+    },
+    [files, uploadPath, clientId, clientSecret]
+  );
 
   const clearAllFiles = useCallback(() => {
     setFiles([]);
