@@ -1,7 +1,14 @@
-export interface UploadFile {
-  file: File;
+export type UploadStatus =
+  | "pending"
+  | "uploading"
+  | "success"
+  | "error"
+  | "deleting";
+
+export type UploadFile = {
   id: string;
-  status: "pending" | "uploading" | "success" | "error";
+  file: File;
+  status: UploadStatus;
   progress: number;
   error?: string;
-}
+};
