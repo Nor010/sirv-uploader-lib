@@ -33,6 +33,8 @@ export function FileList({
     switch (status) {
       case "uploading":
         return <Loader2 className="h-4 w-4 animate-spin text-blue-500" />;
+      case "deleting":
+        return <Loader2 className="h-4 w-4 animate-spin text-red-500" />;
       case "success":
         return <CheckCircle className="h-4 w-4 text-green-500" />;
       case "error":
@@ -104,9 +106,13 @@ export function FileList({
                 <Button
                   size="sm"
                   variant="outline"
+                  disabled={
+                    uploadFile.status === "deleting" ||
+                    uploadFile.status === "uploading"
+                  }
                   onClick={() => onRemoveFile(uploadFile.id)}
                 >
-                  Remove
+                  {uploadFile.status === "deleting" ? "Removing..." : "Remove"}
                 </Button>
               </div>
             </div>
